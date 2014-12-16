@@ -1,0 +1,45 @@
+#!/usr/bin/python
+
+import json
+import re
+
+running_containers = []
+
+{{ $local := . }}
+{{range $key, $value := .}}
+
+# {{ $value.Name }}
+{{ $tag := "latest" }}
+{{ if $value.Image.Tag }}
+{{ $tag := $value.Image.Tag }}
+{{end}}
+
+running_container = {
+                      "host"       : "{{ $local.Env.HOST_IP }}",
+                      "container_id" : "{{ printf "%.*s" 24 $value.ID }}",
+                      "name"       : "{{ $value.Name }}",
+                      "registry"   : "{{ $value.Image.Registry }}",
+                      "repository" : "{{ $value.Image.Repository }}",
+                      "tag"        : "{{ $tag }}",
+                      "addresses"  : "{{ $value.Addresses }}"
+                    }
+
+#running_container['addresses'] = "[{172.17.0.3 2379 } {172.17.0.3 2380 } {172.17.0.3 4001 4001} {172.17.0.3 7001 }]"
+address_string = running_container['addresses'].replace('} {','},{').replace('{','"').replace('}','"')
+address_list = [re.sub(' +',' ',item.strip()).split(' ') for item in eval(address_string)]
+port_dicts = []
+for item in address_list:
+  parts_no = len(item)
+  internal_port, host_port = item[1], None
+  if parts_no > 3:
+    host_port = item[2]
+  port_dicts.append({'internal':internal_port, 'external':host_port})
+
+del running_container['addresses']
+running_container['ports'] = port_dicts
+
+running_containers.append(running_container)
+
+{{end}}
+
+open('/tmp/containers.json', 'w').write(json.dumps({ 'containers' : running_containers}))
