@@ -9,7 +9,8 @@ RUN tar xvzf docker-gen-linux-amd64-0.3.6.tar.gz -C /usr/local/bin
 
 ENV DOCKER_HOST unix:///var/run/docker.sock
 ENV NOTIFY cat /tmp/containers.json
+ENV INTERVAL 10
 
 ADD . /
 
-CMD docker-gen -interval 10 -watch -notify "python /tmp/print-containers.py ; $NOTIFY" /print-containers.tmpl /tmp/print-containers.py
+CMD docker-gen -interval $INTERVAL -watch -notify "python /tmp/print-containers.py ; $NOTIFY" /print-containers.tmpl /tmp/print-containers.py
