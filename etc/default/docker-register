@@ -1,0 +1,2 @@
+NOTIFY="cat /tmp/containers.json"
+INTERVAL=10

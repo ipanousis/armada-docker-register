@@ -15,4 +15,4 @@ ENV INTERVAL 10
 
 ADD . /
 
-CMD /usr/bin/supervisord -c /etc/supervisord.conf
+CMD /usr/local/bin/supervisord -c /etc/supervisord.conf

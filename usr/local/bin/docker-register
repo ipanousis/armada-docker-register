@@ -1,0 +1,5 @@
+#!/bin/bash
+
+. /etc/default/docker-register
+
+/usr/local/bin/docker-gen -interval $INTERVAL -watch -notify "python /tmp/print-containers.py ; $NOTIFY" /print-containers.tmpl /tmp/print-containers.py
